@@ -64,6 +64,40 @@ function TodoPage() {
     }
   };
 
+  const updateTodo = async (id, changedTodo, changedIsCompleted) => {
+    setTodoList(
+      todoList.map((todo) =>
+        todo.id === id
+          ? { ...todo, todo: changedTodo, isCompleted: changedIsCompleted }
+          : todo
+      )
+    );
+    const url = `https://www.pre-onboarding-selection-task.shop/todos/${id}`;
+    const token = localStorage.getItem("access_token");
+    const requetOptions = {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        todo: changedTodo,
+        isCompleted: changedIsCompleted,
+      }),
+    };
+    try {
+      const response = await fetch(url, requetOptions);
+      const data = response.json();
+      console.log(data);
+
+      if (!response.ok) {
+        throw new Error("Todo 수정 요청을 보내는데 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("ToDo Error:", error);
+    }
+  };
+
   return (
     <>
       <div>
@@ -86,7 +120,14 @@ function TodoPage() {
       </div>
       <ul>
         {todoList.map(({ id, todo, isCompleted }) => (
-          <TodoList key={id} todo={todo} isCompleted={isCompleted} />
+          <TodoList
+            key={id}
+            todo={todo}
+            isCompleted={isCompleted}
+            onUpdate={(isCompleted) => {
+              updateTodo(id, todo, isCompleted);
+            }}
+          />
         ))}
       </ul>
     </>
