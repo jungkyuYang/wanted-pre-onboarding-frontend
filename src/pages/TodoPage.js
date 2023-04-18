@@ -15,6 +15,30 @@ function TodoPage() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const getTodo = async () => {
+      const url = "https://www.pre-onboarding-selection-task.shop/todos";
+      const token = localStorage.getItem("access_token");
+      const requetOptions = {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      try {
+        const response = await fetch(url, requetOptions);
+        if (!response.ok) {
+          throw new Error("Todo 리스트 요청을 받는데 실패했습니다.");
+        }
+        const data = await response.json();
+        setTodoList(data);
+      } catch (error) {
+        console.error("Todo Error:", error);
+      }
+    };
+    getTodo();
+  }, []);
+
   const createTodo = async () => {
     const url = "https://www.pre-onboarding-selection-task.shop/todos";
     const token = localStorage.getItem("access_token");
@@ -61,8 +85,9 @@ function TodoPage() {
         </button>
       </div>
       <ul>
-        <TodoList todo="TODO 1" isCompleted={false} />
-        <TodoList todo="TODO 2" isCompleted={true} />
+        {todoList.map(({ id, todo, isCompleted }) => (
+          <TodoList key={id} todo={todo} isCompleted={isCompleted} />
+        ))}
       </ul>
     </>
   );
