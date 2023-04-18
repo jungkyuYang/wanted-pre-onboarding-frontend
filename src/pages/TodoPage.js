@@ -64,11 +64,11 @@ function TodoPage() {
     }
   };
 
-  const updateTodo = async (id, changedTodo, changedIsCompleted) => {
+  const updateTodo = async (id, editTodo, changedIsCompleted) => {
     setTodoList(
       todoList.map((todo) =>
         todo.id === id
-          ? { ...todo, todo: changedTodo, isCompleted: changedIsCompleted }
+          ? { ...todo, todo: editTodo, isCompleted: changedIsCompleted }
           : todo
       )
     );
@@ -81,7 +81,7 @@ function TodoPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        todo: changedTodo,
+        todo: editTodo,
         isCompleted: changedIsCompleted,
       }),
     };
@@ -143,8 +143,8 @@ function TodoPage() {
             key={id}
             todo={todo}
             isCompleted={isCompleted}
-            onUpdate={(isCompleted) => {
-              updateTodo(id, todo, isCompleted);
+            onUpdate={(editTodo, isCompleted) => {
+              updateTodo(id, editTodo, isCompleted);
             }}
             onDelete={() => {
               deleteTodo(id);
