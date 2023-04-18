@@ -87,8 +87,6 @@ function TodoPage() {
     };
     try {
       const response = await fetch(url, requetOptions);
-      const data = response.json();
-      console.log(data);
 
       if (!response.ok) {
         throw new Error("Todo 수정 요청을 보내는데 실패했습니다.");
