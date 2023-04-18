@@ -1,27 +1,50 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Input from "../components/Input";
 
 function SignUpPage() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [isValid, setIsValid] = useState({ isEmail: false, isPassword: false });
 
-  function handleEmailChange(event) {
-    const newValue = event.target.value;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const url = "https://www.pre-onboarding-selection-task.shop/auth/signup";
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: form.email, password: form.password }),
+    };
+
+    try {
+      const response = await fetch(url, requestOptions);
+      if (!response.ok) {
+        throw new Error("회원가입 요청을 보내는데 실패했습니다.");
+      }
+      return navigate("/signin");
+    } catch (error) {
+      console.error("SignUp Error:", error);
+    }
+  };
+
+  function handleEmailChange(e) {
+    const newValue = e.target.value;
 
     setForm({ ...form, email: newValue });
     setIsValid({ ...isValid, isEmail: newValue.indexOf("@") !== -1 });
   }
 
-  function handlePasswordChange(event) {
-    const newValue = event.target.value;
+  function handlePasswordChange(e) {
+    const newValue = e.target.value;
 
     setForm({ ...form, password: newValue });
     setIsValid({ ...isValid, isPassword: newValue.length >= 8 });
   }
 
   return (
-    <form onSubmit={() => {}}>
+    <form onSubmit={handleSubmit}>
       <Input
         id="email"
         value={form.email}
