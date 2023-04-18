@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Input from "../components/Input";
@@ -8,6 +8,12 @@ function SignInPage() {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [isValid, setIsValid] = useState({ isEmail: false, isPassword: false });
+
+  useEffect(() => {
+    if (localStorage.getItem("access_token")) {
+      return navigate("/todo");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
