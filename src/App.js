@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
+import Layout from "./components/Layout";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
@@ -15,15 +16,15 @@ const ROUTES = {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      <Route path={ROUTES.MAIN} element={<Layout />}>
         <Route path={ROUTES.MAIN} element={<MainPage />} />
         <Route path={ROUTES.SIGNUP} element={<SignUpPage />} />
         <Route path={ROUTES.SIGNIN} element={<SignInPage />} />
         <Route path={ROUTES.TODO} element={<TodoPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
+      </Route>
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
 
