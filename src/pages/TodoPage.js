@@ -92,7 +92,28 @@ function TodoPage() {
         throw new Error("Todo 수정 요청을 보내는데 실패했습니다.");
       }
     } catch (error) {
-      console.error("ToDo Error:", error);
+      console.error("Todo Error:", error);
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    setTodoList(todoList.filter((todo) => todo.id !== id));
+    const url = `https://www.pre-onboarding-selection-task.shop/todos/${id}`;
+    const token = localStorage.getItem("access_token");
+    const requetOptions = {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    try {
+      const response = await fetch(url, requetOptions);
+
+      if (!response.ok) {
+        throw new Error("Todo 삭제 요청을 보내는데 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Todo Error:", error);
     }
   };
 
@@ -124,6 +145,9 @@ function TodoPage() {
             isCompleted={isCompleted}
             onUpdate={(isCompleted) => {
               updateTodo(id, todo, isCompleted);
+            }}
+            onDelete={() => {
+              deleteTodo(id);
             }}
           />
         ))}
