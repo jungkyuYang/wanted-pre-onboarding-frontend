@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Input from "../components/Input";
+import { authApi } from "../utils/authApi";
 
 function SignInPage() {
   const navigate = useNavigate();
@@ -17,27 +18,12 @@ function SignInPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = "https://www.pre-onboarding-selection-task.shop/auth/signin";
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: form.email, password: form.password }),
-    };
 
-    try {
-      const response = await fetch(url, requestOptions);
-      if (!response.ok) {
-        throw new Error("로그인 요청을 보내는데 실패했습니다.");
-      }
-      const JWTToken = await response.json();
-
-      for (const [key, value] of Object.entries(JWTToken)) {
-        localStorage.setItem([key], [value]);
-      }
-      return navigate("/todo");
-    } catch (error) {
-      console.error("SignIn Error:", error);
+    const data = await authApi.signin(form);
+    for (const [key, value] of Object.entries(data)) {
+      localStorage.setItem([key], [value]);
     }
+    return navigate("/todo");
   };
 
   function handleEmailChange(event) {

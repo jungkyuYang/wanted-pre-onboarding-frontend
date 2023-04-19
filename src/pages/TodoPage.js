@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { todoApi } from "../utils/todoApi";
 import TodoList from "../components/TodoList";
 
 function TodoPage() {
@@ -16,55 +17,25 @@ function TodoPage() {
   }, [navigate]);
 
   useEffect(() => {
-    const getTodo = async () => {
-      const url = "https://www.pre-onboarding-selection-task.shop/todos";
-      const token = localStorage.getItem("access_token");
-      const requetOptions = {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      try {
-        const response = await fetch(url, requetOptions);
-        if (!response.ok) {
-          throw new Error("Todo 리스트 요청을 받는데 실패했습니다.");
-        }
-        const data = await response.json();
-        setTodoList(data);
-      } catch (error) {
-        console.error("Todo Error:", error);
-      }
+    const fetchTodo = async () => {
+      const data = await todoApi.getTodo(localStorage.getItem("access_token"));
+      setTodoList(data);
     };
-    getTodo();
+    fetchTodo();
   }, []);
 
-  const createTodo = async () => {
-    const url = "https://www.pre-onboarding-selection-task.shop/todos";
-    const token = localStorage.getItem("access_token");
-    const requetOptions = {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ todo: newTodo }),
-    };
-    try {
-      const response = await fetch(url, requetOptions);
+  const onAddHandler = async () => {
+    if (newTodo === "") return;
 
-      if (!response.ok) {
-        throw new Error("Todo 생성 요청을 보내는데 실패했습니다.");
-      }
-      const data = await response.json();
-      setTodoList([...todoList, data]);
-      setNewTodo("");
-    } catch (error) {
-      console.error("Todo Error:", error);
-    }
+    const data = await todoApi.createTodo(
+      localStorage.getItem("access_token"),
+      newTodo
+    );
+    setTodoList([...todoList, data]);
+    setNewTodo("");
   };
 
-  const updateTodo = async (id, editTodo, changedIsCompleted) => {
+  const onChangeHandler = async (id, editTodo, changedIsCompleted) => {
     setTodoList(
       todoList.map((todo) =>
         todo.id === id
@@ -72,49 +43,17 @@ function TodoPage() {
           : todo
       )
     );
-    const url = `https://www.pre-onboarding-selection-task.shop/todos/${id}`;
-    const token = localStorage.getItem("access_token");
-    const requetOptions = {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        todo: editTodo,
-        isCompleted: changedIsCompleted,
-      }),
-    };
-    try {
-      const response = await fetch(url, requetOptions);
-
-      if (!response.ok) {
-        throw new Error("Todo 수정 요청을 보내는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Todo Error:", error);
-    }
+    await todoApi.updateTodo(
+      localStorage.getItem("access_token"),
+      id,
+      editTodo,
+      changedIsCompleted
+    );
   };
 
-  const deleteTodo = async (id) => {
+  const onDeleteHandler = async (id) => {
     setTodoList(todoList.filter((todo) => todo.id !== id));
-    const url = `https://www.pre-onboarding-selection-task.shop/todos/${id}`;
-    const token = localStorage.getItem("access_token");
-    const requetOptions = {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    try {
-      const response = await fetch(url, requetOptions);
-
-      if (!response.ok) {
-        throw new Error("Todo 삭제 요청을 보내는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Todo Error:", error);
-    }
+    await todoApi.deleteTodo(localStorage.getItem("access_token"), id);
   };
 
   return (
@@ -132,7 +71,7 @@ function TodoPage() {
         <button
           type="button"
           data-testid="new-todo-add-button"
-          onClick={createTodo}
+          onClick={onAddHandler}
         >
           추가
         </button>
@@ -144,10 +83,10 @@ function TodoPage() {
             todo={todo}
             isCompleted={isCompleted}
             onUpdate={(editTodo, isCompleted) => {
-              updateTodo(id, editTodo, isCompleted);
+              onChangeHandler(id, editTodo, isCompleted);
             }}
             onDelete={() => {
-              deleteTodo(id);
+              onDeleteHandler(id);
             }}
           />
         ))}

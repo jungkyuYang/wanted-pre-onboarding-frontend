@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Input from "../components/Input";
+import { authApi } from "../utils/authApi";
 
 function SignUpPage() {
   const navigate = useNavigate();
@@ -17,21 +18,9 @@ function SignUpPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = "https://www.pre-onboarding-selection-task.shop/auth/signup";
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: form.email, password: form.password }),
-    };
-
-    try {
-      const response = await fetch(url, requestOptions);
-      if (!response.ok) {
-        throw new Error("회원가입 요청을 보내는데 실패했습니다.");
-      }
+    const data = await authApi.signup(form);
+    if (data) {
       return navigate("/signin");
-    } catch (error) {
-      console.error("SignUp Error:", error);
     }
   };
 
